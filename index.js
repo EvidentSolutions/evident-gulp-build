@@ -95,29 +95,26 @@ exports.register = function(gulp) {
             externalLibraries.push(key);
     }
 
-    // Create a bundle containing all external libraries.
+    // Create a bundle containing all external libraries. Note that this is only needed when debugging,
+    // because in static bundle the external libraries are bundled in the main JS.
     gulp.task('compile-libs', function () {
 
         /* @type {Object} */
-        var bundler = browserify({debug: !settings.staticBundle});
+        var bundler = browserify({debug: true});
         bundler.transform(browserifyShim);
+        bundler.on('error', handleErrors);
 
         for (var key in browserDependencies)
             if (browserDependencies.hasOwnProperty(key) && /^\.\/(node_modules|bower_components)\/.+$/.test(browserDependencies[key]))
                 bundler.require(browserDependencies[key], {expose: key});
 
-        bundler.on('error', handleErrors);
-
         return bundler.bundle()
             .on('error', handleErrors)
             .pipe(source('libs.js'))
-            .pipe(gulpif(settings.staticBundle, streamify(uglify())))
             .pipe(gulp.dest(path.join(paths.build.dest, 'js')));
     });
 
-    // Create a bundle containing our own dependencies.
-    gulp.task('compile-js', ['compile-libs', 'compile-angular-templates'], function () {
-
+    function compileAppJs(targetName, watch) {
         // Variables which will be inlined to src/js/config.js
         var env = {
             API_BASE: settings.staticBundle ? '/api' : 'http://localhost:8080/api',
@@ -127,16 +124,24 @@ exports.register = function(gulp) {
 
         /* @type {Object} */
         var bundler = browserify('./src/js/main.js', {debug: settings.staticBundle, cache: {}, packageCache: {}, fullPaths: true});
-        if (config.watch)
+        if (watch) {
             bundler = watchify(bundler);
 
+            // when watching, we don't wish to rebuild the external libraries all the time, so
+            // we'll exclude them from the bundle
+            bundler.external(externalLibraries);
+
+            // During watching we wish to load the templates directly from the server.
+            bundler.ignore('templates');
+
+            bundler.on('update', rebundle);
+        }
+
+        // bundler.plugin('tsify', { noImplicitAny: false, target: 'ES5' });
         bundler.transform(browserifyShim);
         bundler.transform(es6ify.configure(/^(?!.*(node_modules|bower_components))+.+\.js$/));
         bundler.transform(envifyCustom(env));
 
-        bundler.external(externalLibraries);
-
-        bundler.on('update', rebundle);
         bundler.on('log', function (msg) {
             msg = msg.replace(/\d+(\.\d*)? seconds*/g, function (m) { return gutil.colors.magenta(m); });
             gutil.log("watchify:", gutil.colors.blue('app.js'), msg);
@@ -147,12 +152,17 @@ exports.register = function(gulp) {
         function rebundle() {
             return bundler.bundle()
                 .on('error', handleErrors)
-                .pipe(source('app.js'))
+                .pipe(source(targetName))
                 .pipe(gulpif(settings.staticBundle, streamify(uglify())))
                 .pipe(gulp.dest(path.join(paths.build.dest, 'js')));
         }
 
         return rebundle();
+    }
+
+    // Create a bundle containing our own dependencies.
+    gulp.task('compile-js', ['compile-libs', 'compile-angular-templates'], function () {
+        return compileAppJs('app.js', true);
     });
 
     // Starts an express server serving the static resources and begins watching changes

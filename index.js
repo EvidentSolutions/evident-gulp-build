@@ -40,7 +40,7 @@ function register(gulp) {
     // Paths for various assets.
     var paths = {
         sass: './src/css/*.scss',
-        templates: './src/templates/**/*.html',
+        templates: path.join(settings.paths.templates, '**/*.html'),
         views: './src/views/**/*.hbs',
         build: {
             dest: path.join(settings.paths.output, 'static'),
@@ -141,24 +141,19 @@ function register(gulp) {
 
     // Starts an express server serving the static resources and begins watching changes
     gulp.task('serve', ['watch'], function() {
-
-        /** @type Object */
         var app = express();
 
         app.use(morgan('dev'));
+        app.use(settings.indexPagePattern, express.static(path.join(paths.build.dest, 'index.html')));
         app.use(express.static(paths.build.dest));
-        //app.use('/font-awesome', express.static(paths.build.dest)); // hack
-        app.use('/templates', express.static('./src/templates'));
-
-        app.use(/^\/(post|posts|login)(\/.*)?$/, express.static(path.join(paths.build.dest, 'index.html')));
+        app.use(express.static(settings.paths.templates));
 
         //noinspection JSUnresolvedFunction
         http.createServer(app).listen(settings.serve.port).on('error', handleErrors);
         gutil.log("Started development server:", gutil.colors.magenta("http://localhost:" + settings.serve.port + "/"));
 
-        /** @type Object */
         var lrServer = livereload();
-        gulp.watch([path.join(paths.build.dest, '**'), './src/templates/**'])
+        gulp.watch([path.join(paths.build.dest, '**'), paths.templates])
             .on('change', function(file) { lrServer.changed(file.path);})
             .on('error', handleErrors);
     });

@@ -96,8 +96,7 @@ function register(gulp) {
             DEBUG_LOGGING: !settings.staticBundle
         };
 
-        /* @type {Object} */
-        var bundler = browserify('./src/js/main.js', {debug: settings.staticBundle, cache: {}, packageCache: {}, fullPaths: true});
+        var bundler = browserify(settings.paths.entryPoint, {debug: settings.staticBundle, cache: {}, packageCache: {}, fullPaths: true});
         if (watch) {
             bundler = watchify(bundler);
 

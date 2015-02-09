@@ -1,45 +1,36 @@
 "use strict";
 
-var settings = exports.settings = {
-    exitOnFailure: true,
-    staticBundle: false,
+var del             = require('del');
+var path            = require('path');
+var browserify      = require('browserify');
+var browserifyShim  = require('browserify-shim');
+var es6ify          = require('es6ify');
+var source          = require('vinyl-source-stream');
+var express         = require('express');
+var http            = require('http');
+var morgan          = require('morgan');
+var livereload      = require('gulp-livereload');
+var sass            = require('gulp-sass');
+var size            = require('gulp-size');
 
-    serve: {
-        port: 3000
-    },
+var templateCache   = require('gulp-angular-templatecache');
+var rename          = require("gulp-rename");
+var handlebars      = require('gulp-compile-handlebars');
+var envifyCustom    = require('envify/custom');
+var revall          = require('gulp-rev-all');
+var uglify          = require('gulp-uglify');
+var gulpif          = require('gulp-if');
+var streamify       = require('gulp-streamify');
+var concatCss       = require('gulp-concat-css');
+var gutil           = require('gulp-util');
+var protractor      = require('gulp-protractor').protractor;
+var karma           = require('gulp-karma');
+var watchify        = require('watchify');
 
-    paths: {
-        output: './build/gulp'
-    }
-};
+var settings = require('./lib/settings');
+var handleErrors = require('./lib/error-handler');
 
-exports.register = function(gulp) {
-    var del             = require('del');
-    var path            = require('path');
-    var browserify      = require('browserify');
-    var browserifyShim  = require('browserify-shim');
-    var es6ify          = require('es6ify');
-    var source          = require('vinyl-source-stream');
-    var express         = require('express');
-    var http            = require('http');
-    var morgan          = require('morgan');
-    var livereload      = require('gulp-livereload');
-    var sass            = require('gulp-sass');
-    var size            = require('gulp-size');
-    var notify          = require('gulp-notify');
-    var templateCache   = require('gulp-angular-templatecache');
-    var rename          = require("gulp-rename");
-    var handlebars      = require('gulp-compile-handlebars');
-    var envifyCustom    = require('envify/custom');
-    var revall          = require('gulp-rev-all');
-    var uglify          = require('gulp-uglify');
-    var gulpif          = require('gulp-if');
-    var streamify       = require('gulp-streamify');
-    var concatCss       = require('gulp-concat-css');
-    var gutil           = require('gulp-util');
-    var protractor      = require('gulp-protractor').protractor;
-    var karma           = require('gulp-karma');
-    var watchify        = require('watchify');
+function register(gulp) {
 
     var config = {
         // Should we start watching for changes?
@@ -67,23 +58,6 @@ exports.register = function(gulp) {
             ]
         }
     };
-
-    function handleErrors() {
-        /*jshint validthis:true */
-        // Send error to notification center with gulp-notify
-        notify.onError({
-            title: "Build Error",
-            message: "<%= error.message %>"
-        }).apply(this, arguments);
-
-        if (settings.exitOnFailure) {
-            process.exit(1);
-        }
-
-        // Keep gulp from hanging on this task
-        //noinspection JSHint
-        this.emit('end');
-    }
 
     // Read 'package.json' to see which external libraries we are using and mark them
     // as external libraries for browserify. This lets us produce different bundles for
@@ -322,4 +296,7 @@ exports.register = function(gulp) {
     gulp.task('default', ['clean'], function () {
         gulp.start('serve');
     });
-};
+}
+
+exports.settings = settings;
+exports.register = register;

@@ -112,6 +112,8 @@ function register(gulp) {
             bundler.require('./' + path.join(settings.paths.output, 'tmp/angular-templates.js'), { expose: 'angular-templates' });
         }
 
+        bundler.require(require.resolve('es6ify/node_modules/traceur/bin/traceur-runtime.js'), { expose: 'traceur-runtime' });
+
         // bundler.plugin('tsify', { noImplicitAny: false, target: 'ES5' });
         bundler.transform(browserifyShim);
         bundler.transform(es6ify.configure(/^(?!.*(node_modules|bower_components))+.+\.js$/));

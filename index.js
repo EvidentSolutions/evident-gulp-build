@@ -106,9 +106,11 @@ function register(gulp) {
             bundler.external(externalLibraries);
 
             // During watching we wish to load the templates directly from the server.
-            bundler.ignore('templates');
+            bundler.ignore('angular-templates');
 
             bundler.on('update', rebundle);
+        } else {
+            bundler.require('./' + path.join(settings.paths.output, 'tmp/angular-templates.js'), { expose: 'angular-templates' });
         }
 
         // bundler.plugin('tsify', { noImplicitAny: false, target: 'ES5' });
@@ -118,7 +120,7 @@ function register(gulp) {
 
         bundler.on('log', function (msg) {
             msg = msg.replace(/\d+(\.\d*)? seconds*/g, function (m) { return gutil.colors.magenta(m); });
-            gutil.log("watchify:", gutil.colors.blue('app.js'), msg);
+            gutil.log("browserify:", gutil.colors.blue(targetName), msg);
         });
 
         bundler.on('error', handleErrors);
@@ -135,12 +137,16 @@ function register(gulp) {
     }
 
     // Create a bundle containing our own dependencies.
-    gulp.task('compile-js', ['compile-libs', 'compile-angular-templates'], function () {
+    gulp.task('watch-js', ['compile-libs'], function () {
         return compileAppJs('app.js', true);
     });
 
+    gulp.task('compile-js', ['compile-angular-templates'], function () {
+        return compileAppJs('bundle.js', false);
+    });
+
     // Starts an express server serving the static resources and begins watching changes
-    gulp.task('serve', ['watch'], function() {
+    gulp.task('serve:internal', ['watch'], function() {
         var app = express();
 
         app.use(morgan('dev'));
@@ -206,8 +212,8 @@ function register(gulp) {
     gulp.task('styles', ['sass', 'vendor-css', 'fonts']);
 
     // Starts watching for changes
-    gulp.task('watch', ['build'], function() {
-        //gulp.watch(['./src/js/**/*.js'], ['compile-js']);
+    gulp.task('watch', ['watch-js', 'styles', 'templates'], function() {
+        //gulp.watch(['./src/js/**/*.js'], ['watch-js']);
         gulp.watch(paths.sass, ['sass']);
         gulp.watch(paths.views, ['compile-views']);
     });
@@ -215,7 +221,7 @@ function register(gulp) {
     // Compiles handlebars templates to html
     gulp.task('compile-views', function() {
         return gulp.src(paths.views)
-            .pipe(handlebars({}))
+            .pipe(handlebars({ staticBundle: settings.staticBundle }))
             .pipe(rename(function(path) {
                 path.extname = '.html';
             }))
@@ -226,10 +232,10 @@ function register(gulp) {
     // Compiles angular templates to a single JavaScript module which populates the template-cache
     gulp.task('compile-angular-templates', function () {
         return gulp.src(paths.templates)
-            .pipe(templateCache({
-                'module': 'blogular.templates',
+            .pipe(templateCache('angular-templates.js', {
+                'module': 'angular-templates',
                 'standalone': true,
-                'root': '/templates/'
+                'root': '/'
             }))
             .pipe(size({showFiles: true}))
             .pipe(gulp.dest(paths.build.tmp))
@@ -285,6 +291,19 @@ function register(gulp) {
         settings.staticBundle = false;
         config.watch = false;
         gulp.start('build');
+    });
+
+    gulp.task('serve', function(cb) {
+        config.exitOnFailure = false;
+        gulp.start(['serve:internal']);
+        cb();
+    });
+
+    gulp.task('serve:bundle', function (cb) {
+        settings.staticBundle = true;
+
+        gulp.start(['compile-js', 'compile-views', 'compile-angular-templates', 'serve']);
+        cb();
     });
 
     // By default, clean everything built and start local server

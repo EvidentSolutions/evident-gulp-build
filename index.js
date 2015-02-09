@@ -1,6 +1,12 @@
-exports.register = function(gulp) {
-    "use strict";
+"use strict";
 
+var settings = exports.settings = {
+    serve: {
+        port: 3000
+    }
+};
+
+exports.register = function(gulp) {
     var del             = require('del');
     var path            = require('path');
     var browserify      = require('browserify');
@@ -34,10 +40,7 @@ exports.register = function(gulp) {
         production: false,
 
         // Should we start watching for changes?
-        watch: true,
-
-        // Port of the development server
-        port: '3000'
+        watch: true
     };
 
 // Paths for various assets.
@@ -157,8 +160,8 @@ exports.register = function(gulp) {
         app.use(/^\/(post|posts|login)(\/.*)?$/, express.static(path.join(paths.build.dest, 'index.html')));
 
         //noinspection JSUnresolvedFunction
-        http.createServer(app).listen(config.port).on('error', handleErrors);
-        gutil.log("Started development server:", gutil.colors.magenta("http://localhost:" + config.port + "/"));
+        http.createServer(app).listen(settings.serve.port).on('error', handleErrors);
+        gutil.log("Started development server:", gutil.colors.magenta("http://localhost:" + settings.serve.port + "/"));
 
         /** @type Object */
         var lrServer = livereload();

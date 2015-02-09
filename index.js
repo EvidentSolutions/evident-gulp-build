@@ -1,7 +1,7 @@
 exports.register = function(gulp) {
     "use strict";
 
-    var clean           = require('gulp-clean');
+    var del             = require('del');
     var path            = require('path');
     var browserify      = require('browserify');
     var browserifyShim  = require('browserify-shim');
@@ -268,8 +268,8 @@ exports.register = function(gulp) {
     gulp.task('templates', ['compile-views', 'compile-angular-templates']);
 
 // Cleans everything built
-    gulp.task('clean', function () {
-        return gulp.src(['build/gulp'], { read: false }).pipe(clean());
+    gulp.task('clean', function (cb) {
+        del('build/gulp', cb);
     });
 
 // Builds everything

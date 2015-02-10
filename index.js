@@ -4,9 +4,6 @@ var parentRequire = require('parent-require');
 var gulp            = parentRequire('gulp');
 var del             = require('del');
 var path            = require('path');
-var browserify      = require('browserify');
-var browserifyShim  = require('browserify-shim');
-var es6ify          = require('es6ify');
 var source          = require('vinyl-source-stream');
 var express         = require('express');
 var http            = require('http');
@@ -18,133 +15,23 @@ var size            = require('gulp-size');
 var templateCache   = require('gulp-angular-templatecache');
 var rename          = require("gulp-rename");
 var handlebars      = require('gulp-compile-handlebars');
-var envifyCustom    = require('envify/custom');
 var revall          = require('gulp-rev-all');
-var uglify          = require('gulp-uglify');
 var gulpif          = require('gulp-if');
-var streamify       = require('gulp-streamify');
 var concatCss       = require('gulp-concat-css');
 var gutil           = require('gulp-util');
 var protractor      = require('gulp-protractor').protractor;
 var karma           = require('gulp-karma');
-var watchify        = require('watchify');
 
-var settings = require('./lib/settings');
-var handleErrors = require('./lib/error-handler');
+var settings        = require('./lib/settings');
+var handleErrors    = require('./lib/error-handler');
+var paths           = require('./lib/paths');
+
+require('./lib/browserify-compile');
 
 var config = {
     // Should we start watching for changes?
     watch: true
 };
-
-// Paths for various assets.
-var paths = {
-    get sass() { return './src/css/*.scss'; },
-    get templates() { return path.join(settings.paths.templates, '**/*.html'); },
-    views: './src/views/**/*.hbs',
-    build: {
-        get dest() { return path.join(settings.paths.output, 'static'); },
-        get tmp() { return path.join(settings.paths.output, 'tmp'); }
-    },
-    vendor: {
-        stylesheets: [
-            './bower_components/bootstrap/dist/css/bootstrap.min.css',
-            './bower_components/font-awesome/css/font-awesome.min.css',
-            './bower_components/animate.css/animate.min.css'
-        ],
-        fonts: [
-            './bower_components/bootstrap/dist/fonts/*',
-            './bower_components/font-awesome/fonts/*'
-        ]
-    }
-};
-
-// Read 'package.json' to see which external libraries we are using and mark them
-// as external libraries for browserify. This lets us produce different bundles for
-// external libraries and our own code, making the incremental builds faster.
-var externalLibraries = [];
-var browserDependencies = require('./package.json').browser;
-for (var key in browserDependencies) {
-    if (browserDependencies.hasOwnProperty(key) && /^\.\/(node_modules|bower_components)\/.+$/.test(browserDependencies[key]))
-        externalLibraries.push(key);
-}
-
-// Create a bundle containing all external libraries. Note that this is only needed when debugging,
-// because in static bundle the external libraries are bundled in the main JS.
-gulp.task('compile-libs', function () {
-
-    /* @type {Object} */
-    var bundler = browserify({debug: true});
-    bundler.transform(browserifyShim);
-    bundler.on('error', handleErrors);
-
-    for (var key in browserDependencies)
-        if (browserDependencies.hasOwnProperty(key) && /^\.\/(node_modules|bower_components)\/.+$/.test(browserDependencies[key]))
-            bundler.require(browserDependencies[key], {expose: key});
-
-    return bundler.bundle()
-        .on('error', handleErrors)
-        .pipe(source('libs.js'))
-        .pipe(gulp.dest(path.join(paths.build.dest, 'js')));
-});
-
-function compileAppJs(targetName, watch) {
-    // Variables which will be inlined to src/js/config.js
-    var env = {
-        API_BASE: settings.staticBundle ? '/api' : 'http://localhost:8080/api',
-        USE_TEMPLATE_CACHE: settings.staticBundle,
-        DEBUG_LOGGING: !settings.staticBundle
-    };
-
-    var bundler = browserify(settings.paths.entryPoint, {debug: settings.staticBundle, cache: {}, packageCache: {}, fullPaths: true});
-    if (watch) {
-        bundler = watchify(bundler);
-
-        // when watching, we don't wish to rebuild the external libraries all the time, so
-        // we'll exclude them from the bundle
-        bundler.external(externalLibraries);
-
-        // During watching we wish to load the templates directly from the server.
-        bundler.ignore('angular-templates');
-
-        bundler.on('update', rebundle);
-    } else {
-        bundler.require('./' + path.join(settings.paths.output, 'tmp/angular-templates.js'), { expose: 'angular-templates' });
-    }
-
-    bundler.require(require.resolve('es6ify/node_modules/traceur/bin/traceur-runtime.js'), { expose: 'traceur-runtime' });
-
-    // bundler.plugin('tsify', { noImplicitAny: false, target: 'ES5' });
-    bundler.transform(browserifyShim);
-    bundler.transform(es6ify.configure(/^(?!.*(node_modules|bower_components))+.+\.js$/));
-    bundler.transform(envifyCustom(env));
-
-    bundler.on('log', function (msg) {
-        msg = msg.replace(/\d+(\.\d*)? seconds*/g, function (m) { return gutil.colors.magenta(m); });
-        gutil.log("browserify:", gutil.colors.blue(targetName), msg);
-    });
-
-    bundler.on('error', handleErrors);
-
-    function rebundle() {
-        return bundler.bundle()
-            .on('error', handleErrors)
-            .pipe(source(targetName))
-            .pipe(gulpif(settings.staticBundle, streamify(uglify())))
-            .pipe(gulp.dest(path.join(paths.build.dest, 'js')));
-    }
-
-    return rebundle();
-}
-
-// Create a bundle containing our own dependencies.
-gulp.task('watch-js', ['compile-libs'], function () {
-    return compileAppJs('app.js', true);
-});
-
-gulp.task('compile-js', ['compile-angular-templates'], function () {
-    return compileAppJs('bundle.js', false);
-});
 
 // Starts an express server serving the static resources and begins watching changes
 gulp.task('serve:internal', ['watch'], function() {
@@ -213,8 +100,7 @@ gulp.task('fonts', function() {
 gulp.task('styles', ['sass', 'vendor-css', 'fonts']);
 
 // Starts watching for changes
-gulp.task('watch', ['watch-js', 'styles', 'templates'], function() {
-    //gulp.watch(['./src/js/**/*.js'], ['watch-js']);
+gulp.task('watch', ['compile:watch', 'styles', 'templates'], function() {
     gulp.watch(paths.sass, ['sass']);
     gulp.watch(paths.views, ['compile-views']);
 });
@@ -271,7 +157,7 @@ gulp.task('clean', function (cb) {
 });
 
 // Builds everything
-gulp.task('build', ['compile-js', 'styles', 'templates']);
+gulp.task('build', ['compile:bundle', 'styles', 'templates']);
 
 // Create an optimized build
 gulp.task('build-optimized', ['build'], function() {
@@ -303,7 +189,7 @@ gulp.task('serve', function(cb) {
 gulp.task('serve:bundle', function (cb) {
     settings.staticBundle = true;
 
-    gulp.start(['compile-js', 'compile-views', 'compile-angular-templates', 'serve']);
+    gulp.start(['compile:bundle', 'compile-views', 'compile-angular-templates', 'serve']);
     cb();
 });
 

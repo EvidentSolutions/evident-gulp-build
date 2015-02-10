@@ -1,6 +1,6 @@
 {
   "name": "evident-gulp-build",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "shared code for gulp builds",
   "keywords": [
     "gulp",
@@ -46,6 +46,7 @@
     "karma-jasmine": "0.1.5",
     "morgan": "1.5.1",
     "node-sass": "0.8.6",
+    "parent-require": "1.0.0",
     "protractor": "0.23.1",
     "vinyl-source-stream": "1.0.0",
     "watchify": "2.3.0"

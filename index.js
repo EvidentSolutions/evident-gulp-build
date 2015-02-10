@@ -1,5 +1,7 @@
 "use strict";
 
+var parentRequire = require('parent-require');
+var gulp            = parentRequire('gulp');
 var del             = require('del');
 var path            = require('path');
 var browserify      = require('browserify');
@@ -30,8 +32,7 @@ var watchify        = require('watchify');
 var settings = require('./lib/settings');
 var handleErrors = require('./lib/error-handler');
 
-function register(gulp) {
-
+function register() {
     var config = {
         // Should we start watching for changes?
         watch: true

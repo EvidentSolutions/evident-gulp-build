@@ -44,6 +44,7 @@
     "karma-browserify": "3.0.1",
     "karma-chrome-launcher": "0.1.4",
     "karma-jasmine": "0.1.5",
+    "lodash": "^3.1.0",
     "morgan": "1.5.1",
     "node-sass": "0.8.6",
     "parent-require": "1.0.0",

@@ -28,6 +28,7 @@
     "gulp-changed": "1.1.1",
     "gulp-compile-handlebars": "0.4.4",
     "gulp-concat-css": "0.1.4",
+    "gulp-gzip": "1.0.0",
     "gulp-if": "1.2.5",
     "gulp-karma": "0.0.4",
     "gulp-livereload": "1.5.0",

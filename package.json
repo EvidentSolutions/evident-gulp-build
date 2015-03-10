@@ -25,6 +25,7 @@
     "es6ify": "1.6.0",
     "express": "4.12.2",
     "gulp-angular-templatecache": "1.5.0",
+    "gulp-autoprefixer": "2.1.0",
     "gulp-changed": "1.1.1",
     "gulp-compile-handlebars": "0.4.4",
     "gulp-concat-css": "0.1.4",

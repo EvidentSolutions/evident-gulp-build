@@ -51,7 +51,6 @@
     "lodash": "3.5.0",
     "morgan": "1.5.1",
     "node-sass": "0.8.6",
-    "parent-require": "1.0.0",
     "protractor": "0.23.1",
     "tsify": "0.8.1",
     "vinyl-source-stream": "1.1.0",

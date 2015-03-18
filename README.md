@@ -40,15 +40,15 @@ Then there are some directories for external libraries and such:
 
 Finally, there are the output directories:
 
-  - `build/gulp/optimized` contains the final build with all optimizations performed.
-  - `build/gulp/static` contains a static build you can serve when developing.
-  - `build/gulp/tmp` contains temporary files created during build.
+  - `build/egb/optimized` contains the final build with all optimizations performed.
+  - `build/egb/static` contains a static build you can serve when developing.
+  - `build/egb/tmp` contains temporary files created during build.
 
 Interesting tasks
 -----------------
 
-  - `watch` compiles everything into `build/gulp/static` and starts watching for changes in the background.
-  - `build:gzip` creates an optimized build into `build/gulp/optimized`.
+  - `watch` compiles everything into `build/egb/static` and starts watching for changes in the background.
+  - `build` creates an optimized build into `build/egb/optimized`.
 
 Settings
 --------
@@ -56,8 +56,8 @@ Settings
 The settings are exposed in a `settings` property of the module, so you can write something like
 the following:
 
-    evidentGulpBuild.settings.paths.entryPoint = './src/foo.ts';
     evidentGulpBuild.settings.traceur.enabled = false;
+    evidentGulpBuild.settings.typescript.flags.noImplicitAny = false;
 
 See [lib/settings.js](lib/settings.js) for details.
 
@@ -73,7 +73,7 @@ and to Handlebars-templates which allows you to have some build-variables. You c
             USE_TEMPLATE_CACHE: true,
             DEBUG_LOGGING: false
         });
-        return gulp.start('build:gzip');
+        return gulp.start('build');
     });
 
 Moreover, there is a predefined variable `EGC_SCM_VERSION` that contains git-version from which the build was made.

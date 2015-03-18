@@ -1,12 +1,13 @@
 {
   "name": "evident-gulp-build",
-  "version": "0.0.21",
+  "version": "0.1.0",
   "description": "shared code for gulp builds",
   "keywords": [
     "gulp",
     "sass",
     "browserify",
-    "typescript"
+    "typescript",
+    "angular"
   ],
   "homepage": "https://bitbucket.org/evidentsolutions/evident-gulp-build",
   "license": "MIT",

@@ -76,4 +76,4 @@ and to Handlebars-templates which allows you to have some build-variables. You c
         return gulp.start('build');
     });
 
-Moreover, there is a predefined variable `EGC_SCM_VERSION` that contains git-version from which the build was made.
+Moreover, there is a predefined variable `EGB_SCM_VERSION` that contains git-version from which the build was made.

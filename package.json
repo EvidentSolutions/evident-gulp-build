@@ -9,13 +9,13 @@
     "typescript",
     "angular"
   ],
-  "homepage": "https://bitbucket.org/evidentsolutions/evident-gulp-build",
+  "homepage": "https://github.com/EvidentSolutions/evident-gulp-build",
   "license": "MIT",
   "author": "Juha Komulainen <juha.komulainen@evident.fi>",
   "main": "./index.js",
   "repository": {
     "type": "git",
-    "url": "git@bitbucket.org:evidentsolutions/evident-gulp-build.git"
+    "url": "git@github.com:EvidentSolutions/evident-gulp-build.git"
   },
   "dependencies": {
     "bower": "1.3.12",

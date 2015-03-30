@@ -3,6 +3,9 @@ evident-gulp-build
 
 Common builds for Angular apps using Browserify, Sass, TypeScript, etc.
 
+[![NPM version](https://img.shields.io/npm/v/evident-gulp-build.svg)](https://www.npmjs.com/package/evident-gulp-build)
+[![Dependency status](https://img.shields.io/david/evidentsolutions/evident-gulp-build.svg)](https://david-dm.org/evidentsolutions/evident-gulp-build)
+
 Getting started
 ---------------
 

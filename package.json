@@ -33,7 +33,7 @@
     "gulp-gzip": "1.1.0",
     "gulp-if": "1.2.5",
     "gulp-karma": "0.0.4",
-    "gulp-livereload": "1.5.0",
+    "gulp-livereload": "3.8.0",
     "gulp-notify": "2.2.0",
     "gulp-protractor": "0.0.12",
     "gulp-rename": "1.2.0",

@@ -35,6 +35,7 @@
     "gulp-karma": "0.0.4",
     "gulp-livereload": "3.8.0",
     "gulp-notify": "2.2.0",
+    "gulp-plumber": "1.0.0",
     "gulp-protractor": "0.0.12",
     "gulp-rename": "1.2.0",
     "gulp-rev-all": "0.7.6",

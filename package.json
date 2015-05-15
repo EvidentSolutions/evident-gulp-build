@@ -52,7 +52,6 @@
     "karma-jasmine": "0.1.5",
     "lodash": "3.6.0",
     "morgan": "1.5.2",
-    "multipipe": "0.1.2",
     "node-sass": "2.1.1",
     "protractor": "0.23.1",
     "tsify": "0.8.1",

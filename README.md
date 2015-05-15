@@ -73,7 +73,6 @@ and to Handlebars-templates which allows you to have some build-variables. You c
     gulp.task('build-production', function () {
         Object.assign(settings.variables, {
             GA_ID: '12345678-9',
-            USE_TEMPLATE_CACHE: true,
             DEBUG_LOGGING: false
         });
         return gulp.start('build');

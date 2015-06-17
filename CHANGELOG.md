@@ -1,3 +1,15 @@
+## 0.2.3 (2015-06-17)
+
+  - Include karma-phantomjs-launcher.
+
+## 0.2.2 (2015-06-15)
+
+  - Fix default value for rev-all option dontRenameFile.
+
+## 0.2.1 (2015-06-14)
+
+  - Upgrade all dependencies to latest versions.
+
 ## 0.2.0 (2015-05-29)
 
   - Upgrade to tsify 0.11.1 (and TypeScript 1.5-beta)

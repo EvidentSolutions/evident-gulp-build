@@ -1,6 +1,6 @@
 {
   "name": "evident-gulp-build",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "shared code for gulp builds",
   "keywords": [
     "gulp",

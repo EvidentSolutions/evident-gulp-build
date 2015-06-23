@@ -1,3 +1,7 @@
+## 0.2.4 (2015-06-23)
+
+  - Copy-resources task which copies images by default.
+
 ## 0.2.3 (2015-06-17)
 
   - Include karma-phantomjs-launcher.

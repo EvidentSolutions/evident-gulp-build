@@ -55,7 +55,7 @@
     "morgan": "1.6.0",
     "node-sass": "3.2.0",
     "protractor": "2.1.0",
-    "tsify": "0.11.2",
+    "tsify": "0.11.11",
     "vinyl-source-stream": "1.1.0",
     "watchify": "3.2.2"
   }

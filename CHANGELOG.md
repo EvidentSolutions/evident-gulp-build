@@ -1,3 +1,7 @@
+## 0.2.7 (2015-12-13)
+
+  - Update dependencies to working versions
+
 ## 0.2.4 (2015-06-23)
 
   - Copy-resources task which copies images by default.

@@ -1,3 +1,7 @@
+## 0.2.8 (2015-12-22)
+
+  - Support handlebars partials
+
 ## 0.2.7 (2015-12-13)
 
   - Update dependencies to working versions
